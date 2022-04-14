@@ -1,2 +1,6 @@
 server:
   port: 8081
+
+jwt:
+  secret: "super-secret-token"
+  expiration: 18000000
