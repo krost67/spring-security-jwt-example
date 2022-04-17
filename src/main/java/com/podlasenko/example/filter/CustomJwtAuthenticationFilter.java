@@ -39,7 +39,7 @@ public class CustomJwtAuthenticationFilter extends OncePerRequestFilter {
                     userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         } else {
-            log.error("Cannot set the Security Context");
+            log.debug("Cannot set the Security Context");
         }
 
         chain.doFilter(request, response);

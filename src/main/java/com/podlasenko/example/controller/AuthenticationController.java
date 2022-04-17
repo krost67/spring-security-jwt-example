@@ -2,6 +2,7 @@ package com.podlasenko.example.controller;
 
 import com.podlasenko.example.model.AuthenticationRequest;
 import com.podlasenko.example.model.AuthenticationResponse;
+import com.podlasenko.example.model.UserDTO;
 import com.podlasenko.example.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,4 +20,11 @@ public class AuthenticationController {
         String jwt = authenticationService.authenticate(request);
         return ResponseEntity.ok(new AuthenticationResponse(jwt));
     }
+
+    @PostMapping(value = "/register")
+    public ResponseEntity<?> saveUser(@RequestBody UserDTO user) {
+        authenticationService.registerUser(user);
+        return ResponseEntity.ok().build();
+    }
+
 }

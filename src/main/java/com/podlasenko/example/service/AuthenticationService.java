@@ -1,7 +1,8 @@
 package com.podlasenko.example.service;
 
-import com.podlasenko.example.config.CustomUserDetailsService;
+import com.podlasenko.example.entity.UserEntity;
 import com.podlasenko.example.model.AuthenticationRequest;
+import com.podlasenko.example.model.UserDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,5 +33,9 @@ public class AuthenticationService {
 
         final UserDetails userDetails = customUserDetailsService.loadUserByUsername(request.getUsername());
         return jwtHelperService.generateToken(userDetails);
+    }
+
+    public UserEntity registerUser(UserDTO user) {
+        return customUserDetailsService.save(user);
     }
 }
