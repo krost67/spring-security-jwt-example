@@ -6,12 +6,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ResourceController {
 
-    @GetMapping(path = "/user/hello")
+    @GetMapping(path = "/users/hello")
     public String helloUser(){
         return "Hello User";
     }
 
-    @GetMapping(path = "/admin/hello")
+    @GetMapping(path = "/admins/hello")
     public String helloAdmin(){
         return "Hello Admin";
     }
