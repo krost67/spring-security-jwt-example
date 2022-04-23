@@ -1,6 +1,9 @@
 package com.podlasenko.example.service;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,6 +24,8 @@ public class JWTHelperService {
     private String secret;
     @Value("${jwt.expiration}")
     private long expiration;
+    @Value("${jwt.refreshExpiration}")
+    private long refreshExpiration;
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
@@ -33,38 +38,40 @@ public class JWTHelperService {
             claims.put("isUser", true);
         }
 
-        return initJWTToken(claims, userDetails.getUsername());
+        return initJWTToken(claims, userDetails.getUsername(), expiration);
     }
 
-    private String initJWTToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(SignatureAlgorithm.HS512, secret)
-                .compact();
+    public String generateRefreshToken(Map<String, Object> claims, String subject) {
+        return initJWTToken(claims, subject, refreshExpiration);
     }
 
     public boolean validateToken(String token) {
         try {
             // Jwt token has not been tampered with
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
+            Jwts.parser()
+                    .setSigningKey(secret)
+                    .parseClaimsJws(token);
             return true;
         } catch (JwtException ex) {
             log.error("Validation error: " + ex.getMessage());
-            return false;
+            throw ex;
         }
     }
 
     public String getUsernameFromToken(String token) {
-        Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token)
+                .getBody();
         return claims.getSubject();
     }
 
     public List<SimpleGrantedAuthority> getRolesFromToken(String authToken) {
         List<SimpleGrantedAuthority> roles = null;
-        Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(authToken).getBody();
+        Claims claims = Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(authToken)
+                .getBody();
 
         Boolean isAdmin = claims.get("isAdmin", Boolean.class);
         Boolean isUser = claims.get("isUser", Boolean.class);
@@ -79,4 +86,13 @@ public class JWTHelperService {
         return roles;
     }
 
+    private String initJWTToken(Map<String, Object> claims, String subject, long expiration) {
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(SignatureAlgorithm.HS512, secret)
+                .compact();
+    }
 }

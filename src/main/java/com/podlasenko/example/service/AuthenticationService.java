@@ -11,6 +11,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -33,6 +35,10 @@ public class AuthenticationService {
 
         final UserDetails userDetails = customUserDetailsService.loadUserByUsername(request.getUsername());
         return jwtHelperService.generateToken(userDetails);
+    }
+
+    public String refreshToken(Map<String, Object> claims) {
+        return jwtHelperService.generateRefreshToken(claims, claims.get("sub").toString());
     }
 
     public UserEntity registerUser(UserDTO user) {

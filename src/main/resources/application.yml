@@ -3,7 +3,8 @@ server:
 
 jwt:
   secret: HIDDEN
-  expiration: 18000000
+  expiration: 3600000
+  refreshExpiration: 18000000
 
 spring:
   datasource:
